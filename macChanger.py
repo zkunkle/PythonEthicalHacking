@@ -34,7 +34,7 @@ def get_current_mac(interface):
     print(ifconfig_result)
 
     # Return the MAC address output from ifconfig_result
-    mac_search = re.search(r"\w\w:\w\w:\w\w:\w\w:\w\w:\w\w", ifconfig_result)
+    mac_search = re.search(r"\w\w:\w\w:\w\w:\w\w:\w\w:\w\w", str(ifconfig_result))
     # if a MAC address is found
     if mac_search:
         return mac_search.group(0)
