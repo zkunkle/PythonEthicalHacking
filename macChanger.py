@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import subprocess
 import optparse
+import re
 
 def get_arguments():
     # user prompt for the interface name and MAC address
@@ -28,7 +29,31 @@ def mac_changer(interface, new_mac):
     subprocess.call(["ifconfig", interface, "hw", "ether", new_mac])
     subprocess.call(["ifconfig", interface, "up"])
 
+def get_current_mac(interface):
+    ifconfig_result = subprocess.check_output(["ifconfig", interface])
+    print(ifconfig_result)
+
+    # Return the MAC address output from ifconfig_result
+    mac_search = re.search(r"\w\w:\w\w:\w\w:\w\w:\w\w:\w\w", ifconfig_result)
+    # if a MAC address is found
+    if mac_search:
+        return mac_search.group(0)
+    # if a MAC address is not found
+    else:
+        print("ERROR: Could not read MAC address")
+
 # Call the functions above
 # get_arguments will return anything from parser.parse_args()
 options = get_arguments()
+
+current_mac = get_current_mac(options.interface)
+print("Current MAC address = " + str(current_mac))
+
 mac_changer(options.interface, options.new_mac)
+
+# Validate that the MAC address changes to what the user wanted
+current_mac = get_current_mac(options.interface)
+if current_mac == options.new_mac:
+    print("MAC address was successfully changed to " + current_mac)
+else:
+    print("ERROR: MAC address was not changed")
